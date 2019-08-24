@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 @Module({
     imports: [
         TypeOrmModule.forRoot({
@@ -18,11 +15,5 @@ import { AppService } from './app.service';
             synchronize: true,
         }),
     ],
-    controllers: [AppController],
-    providers: [AppService],
 })
-export class AppModule {
-    constructor() {
-        console.log(process.env.DB_PORT);
-    }
-}
+export class AppModule {}
