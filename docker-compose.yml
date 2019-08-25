@@ -10,8 +10,8 @@ services:
       POSTGRES_DB: calendar
 
   backend:
-    build:
-      context: ./backend
+    build: ./backend
+    restart: always
     container_name: backend-calendar
     env_file:
       - ./.env

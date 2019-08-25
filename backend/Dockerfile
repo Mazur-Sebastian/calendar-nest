@@ -2,11 +2,8 @@ FROM node:alpine
 
 WORKDIR /backend
 
-COPY ./yarn.lock ./
-COPY ./package.json ./
+COPY . .
 
 RUN yarn
 
-COPY . .
-
-CMD ["yarn", "start:dev"]
+CMD sh -c 'yarn start:dev'
