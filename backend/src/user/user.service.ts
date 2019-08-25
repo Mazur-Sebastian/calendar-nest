@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -17,7 +17,7 @@ export class UserService {
         });
 
         if (isUserExist) {
-            throw new ForbiddenException('User exist');
+            throw new NotAcceptableException('User exist');
         }
 
         const createdUser = this.userRepository.create(userData);
@@ -33,7 +33,19 @@ export class UserService {
 
             return user;
         } catch {
-            throw new ForbiddenException('User exist');
+            throw new NotAcceptableException('User not found');
+        }
+    }
+
+    async findUserByEmail(email: string): Promise<UserEntity> {
+        try {
+            const user = await this.userRepository.findOne({
+                email,
+            });
+
+            return user;
+        } catch {
+            throw new NotAcceptableException('User not found');
         }
     }
 }
