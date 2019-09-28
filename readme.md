@@ -1,18 +1,23 @@
-Zadanie rekrutacyjne
-
-Stack:
+# Stack:
 
 - nest.js
+
 - mongoDB
+
 - yarn
 
-Uruchomienie:
-make build-dev
-make dev
+## Run:
 
-Dokumentacja
+- make build
+
+- dev
+
+- make dev
+
+## Documentation:
 
 - swagger: localhost:5000/api/
+
 - make generate-documentation
 
-Autor ®Sebastian Mazur
+Author **®Sebastian Mazur**
