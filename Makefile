@@ -7,12 +7,5 @@ build-dev:
 dev:
 	docker-compose $(dev-dockerfile) up
 
-build-prod:
-	docker-compose $(prod-dockerfile) build
-	$(MAKE) prod
-
-prod:
-	docker-compose $(prod-dockerfile) up -d
-
-# generate-migrations:
-# 	docker exec -it backend-service-skystatus yarn run migration:generate
+generate-documentation:
+	docker exec -it backend-calendar yarn run documentation

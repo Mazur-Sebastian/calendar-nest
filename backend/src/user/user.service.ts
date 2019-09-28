@@ -1,35 +1,20 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable, NotAcceptableException, Inject } from '@nestjs/common';
+import { Model } from 'mongoose';
 
 import { RegisterUserDto } from 'src/auth/dto/registerUser.dto';
-import { UserEntity } from './user.entity';
+import { USER_SCHEMA } from 'src/constants/schemas';
+import { User } from './models/user.model';
 
 @Injectable()
 export class UserService {
     constructor(
-        @InjectRepository(UserEntity)
-        private readonly userRepository: Repository<UserEntity>,
+        @Inject(USER_SCHEMA)
+        private readonly userModel: Model<User>,
     ) {}
-    async createUser(userData: RegisterUserDto): Promise<UserEntity> {
-        const isUserExist = await this.userRepository.findOne({
-            email: userData.email,
-        });
 
-        if (isUserExist) {
-            throw new NotAcceptableException('User exist');
-        }
-
-        const createdUser = this.userRepository.create(userData);
-
-        return this.userRepository.save(createdUser);
-    }
-
-    async findUserById(id: number): Promise<UserEntity> {
+    async findUserByEmail(email: string): Promise<User> {
         try {
-            const user = await this.userRepository.findOne({
-                id,
-            });
+            const user = await this.userModel.findOne({ email }).exec();
 
             return user;
         } catch {
@@ -37,11 +22,20 @@ export class UserService {
         }
     }
 
-    async findUserByEmail(email: string): Promise<UserEntity> {
+    async createUser(userData: RegisterUserDto): Promise<User> {
+        const user = await this.findUserByEmail(userData.email);
+
+        if (user) {
+            throw new NotAcceptableException('User exist');
+        }
+
+        const createdUser = new this.userModel(userData);
+        return createdUser.save();
+    }
+
+    async findUserById(_id: string): Promise<User> {
         try {
-            const user = await this.userRepository.findOne({
-                email,
-            });
+            const user = await this.userModel.findById({ _id }).exec();
 
             return user;
         } catch {

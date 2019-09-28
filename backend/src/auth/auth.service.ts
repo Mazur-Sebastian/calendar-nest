@@ -5,9 +5,8 @@ import * as bcrypt from 'bcryptjs';
 import { UserService } from './../user/user.service';
 import { RegisterUserDto } from './dto/registerUser.dto';
 import { JwtToken } from './models/jwtToken.model';
-import { UserEntity } from './../user/user.entity';
 import { LoginUserDto } from './dto/loginUser.dto';
-// import { JwtPayload } from './models/jwtPayload.model';
+import { User } from './../user/models/user.model';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -18,7 +17,7 @@ export class AuthService {
         private readonly userService: UserService,
     ) {}
 
-    async loginUser(loginData: LoginUserDto): Promise<any> {
+    async loginUser(loginData: LoginUserDto): Promise<JwtToken> {
         const user = await this.userService.findUserByEmail(loginData.email);
         const match = await bcrypt.compareSync(
             loginData.password,
@@ -29,24 +28,30 @@ export class AuthService {
             throw new NotAcceptableException('Bad password');
         }
 
-        const accessToken = this.jwtService.sign({ id: user.id });
-
-        return { accessToken };
+        return this.jwtSign(user);
     }
 
     async registerUser(registerData: RegisterUserDto): Promise<JwtToken> {
         const hashPassword = await bcrypt.hashSync(registerData.password, salt);
-        const userWithHashPassword = {
+        const userWithHashedPassword = {
             ...registerData,
             password: hashPassword,
         };
-        const { id } = await this.userService.createUser(userWithHashPassword);
-        const accessToken = this.jwtService.sign({ id });
+        const user = await this.userService.createUser(userWithHashedPassword);
+
+        return this.jwtSign(user);
+    }
+
+    jwtSign(user: User): JwtToken {
+        const accessToken = this.jwtService.sign({
+            id: user._id,
+            isAdmin: user.isAdmin,
+        });
 
         return { accessToken };
     }
 
-    async validateUser(id: number): Promise<UserEntity> {
+    async validateUser(id: string): Promise<User> {
         return await this.userService.findUserById(id);
     }
 }

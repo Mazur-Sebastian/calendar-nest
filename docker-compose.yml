@@ -1,13 +1,11 @@
 version: "3.7"
 
 services:
-  db:
-    container_name: db-calendar
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: root
-      POSTGRES_USER: root
-      POSTGRES_DB: calendar
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
 
   backend:
     build: ./backend
@@ -16,7 +14,7 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - db
+      - mongo
 
   nginx:
     container_name: nginx-calendar
